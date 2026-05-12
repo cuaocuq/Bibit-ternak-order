@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TriTernak — Sistem Informasi Penjualan Bibit Babi</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --soil: #1a1209;
+    --bark: #2d1f0e;
+    --mud: #4a3520;
+    --rust: #c4511a;
+    --amber: #e8821a;
+    --gold: #f5a623;
+    --cream: #fdf5e8;
+    --pale: #fefbf3;
+    --sage: #4a7c59;
+    --moss: #2d5a3d;
+    --green-light: #7ab87a;
+    --white: #ffffff;
+    --text-dark: #1a1209;
+    --text-mid: #4a3520;
+    --text-light: #8a6e52;
+    --border: rgba(74,53,32,0.12);
+    --shadow: 0 4px 24px rgba(26,18,9,0.08);
+    --shadow-lg: 0 12px 48px rgba(26,18,9,0.14);
+    --radius: 14px;
+    --radius-sm: 8px;
+    --transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--pale);
+    color: var(--text-dark);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── BACKGROUND TEXTURE ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      radial-gradient(circle at 20% 20%, rgba(232,130,26,0.04) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(74,124,89,0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── NAVBAR ─── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(253,245,232,0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+  }
+  .nav-logo-icon {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, var(--rust), var(--amber));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .nav-logo-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.15rem;
+    color: var(--soil);
+    line-height: 1;
+  }
+  .nav-logo-text span {
+    display: block;
+    font-weight: 400;
+    font-size: 0.68rem;
+    color: var(--text-light);
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    list-style: none;
+  }
+  .nav-links a {
+    text-decoration: none;
+    color: var(--text-mid);
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.45rem 0.85rem;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+  }
+  .nav-links a:hover { background: rgba(74,53,32,0.07); color: var(--soil); }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1.1rem;
+    border-radius: 100px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    border: none;
+    transition: var(--transition);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-mid);
+    border: 1.5px solid var(--border);
+  }
+  .btn-ghost:hover { background: var(--cream); border-color: var(--mud); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--rust), var(--amber));
+    color: white;
+    box-shadow: 0 2px 12px rgba(196,81,26,0.3);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(196,81,26,0.4); }
+  .btn-wa {
+    background: #25D366;
+    color: white;
+    box-shadow: 0 2px 12px rgba(37,211,102,0.3);
+  }
+  .btn-wa:hover { transform: translateY(-1px); background: #1fb855; }
+  .btn-pdf {
+    background: var(--cream);
+    color: var(--text-mid);
+    border: 1.5px solid var(--border);
+  }
+  .btn-pdf:hover { background: white; border-color: var(--mud); }
+
+  .nav-hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 6px;
+    background: none;
+    border: none;
+  }
+  .nav-hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--text-dark);
+    border-radius: 2px;
+    transition: var(--transition);
+  }
+
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    background: var(--pale);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 1.5rem;
+    z-index: 99;
+    flex-direction: column;
+    gap: 0.5rem;
+    box-shadow: var(--shadow-lg);
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a {
+    text-decoration: none;
+    color: var(--text-mid);
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+  }
+  .mobile-menu a:hover { background: var(--cream); }
+  .mobile-menu-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+  .mobile-menu-actions .btn { justify-content: center; width: 100%; }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    min-height: 560px;
+    display: flex;
+    align-items: center;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--bark) 0%, var(--soil) 40%, var(--moss) 100%);
+  }
+  .hero-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 5rem 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 3rem;
+    align-items: center;
+    width: 100%;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(245,166,35,0.15);
+    border: 1px solid rgba(245,166,35,0.3);
+    color: var(--gold);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.35rem 0.85rem;
+    border-radius: 100px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 1.25rem;
+  }
+
+  .hero-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.08;
+    color: var(--cream);
+    margin-bottom: 1rem;
+  }
+  .hero-title em {
+    font-style: normal;
+    color: var(--gold);
+  }
+
+  .hero-desc {
+    color: rgba(253,245,232,0.7);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    max-width: 520px;
+    margin-bottom: 2rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .hero-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    flex-shrink: 0;
+  }
+
+  .stat-pill {
+    background: rgba(253,245,232,0.08);
+    border: 1px solid rgba(253,245,232,0.12);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    text-align: center;
+    min-width: 130px;
+  }
+  .stat-pill-num {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.8rem;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .stat-pill-label {
+    font-size: 0.75rem;
+    color: rgba(253,245,232,0.6);
+    margin-top: 0.3rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* ─── SEARCH + FILTER ─── */
+  .search-section {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 1rem;
+  }
+
+  .search-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 100px;
+    padding: 0.6rem 0.6rem 0.6rem 1.25rem;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+  }
+  .search-bar:focus-within {
+    border-color: var(--amber);
+    box-shadow: 0 0 0 3px rgba(232,130,26,0.12), var(--shadow);
+  }
+  .search-bar input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    background: transparent;
+  }
+  .search-bar input::placeholder { color: var(--text-light); }
+  .search-icon { color: var(--text-light); font-size: 1.1rem; }
+
+  .filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-bottom: 0.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .filter-chips::-webkit-scrollbar { display: none; }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    background: white;
+    color: var(--text-mid);
+    transition: var(--transition);
+    white-space: nowrap;
+    user-select: none;
+  }
+  .chip:hover { border-color: var(--amber); color: var(--rust); background: rgba(232,130,26,0.05); }
+  .chip.active {
+    background: linear-gradient(135deg, var(--rust), var(--amber));
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 2px 10px rgba(196,81,26,0.25);
+  }
+
+  /* ─── MAIN LAYOUT ─── */
+  .main-layout {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 1.5rem 1.5rem 3rem;
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    position: sticky;
+    top: 80px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+  }
+
+  .sidebar-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-light);
+    margin-bottom: 1rem;
+  }
+
+  .sidebar-group { margin-bottom: 1.5rem; }
+  .sidebar-group-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-mid);
+    margin-bottom: 0.6rem;
+  }
+
+  .sidebar-categories { display: flex; flex-direction: column; gap: 0.35rem; }
+  .sidebar-cat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    color: var(--text-mid);
+    cursor: pointer;
+    transition: var(--transition);
+    border: 1px solid transparent;
+  }
+  .sidebar-cat-item:hover { background: var(--cream); }
+  .sidebar-cat-item.active {
+    background: rgba(196,81,26,0.08);
+    color: var(--rust);
+    border-color: rgba(196,81,26,0.15);
+    font-weight: 500;
+  }
+  .sidebar-cat-icon { font-size: 1rem; }
+  .sidebar-cat-count {
+    margin-left: auto;
+    font-size: 0.75rem;
+    background: var(--cream);
+    color: var(--text-light);
+    padding: 0.1rem 0.5rem;
+    border-radius: 100px;
+  }
+
+  .range-group { display: flex; flex-direction: column; gap: 0.5rem; }
+  .range-group input[type=range] {
+    width: 100%;
+    accent-color: var(--rust);
+  }
+  .range-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    color: var(--text-light);
+  }
+
+  .gender-toggle {
+    display: flex;
+    gap: 0.4rem;
+  }
+  .gender-btn {
+    flex: 1;
+    padding: 0.45rem 0.5rem;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    background: white;
+    color: var(--text-mid);
+    text-align: center;
+    transition: var(--transition);
+  }
+  .gender-btn.active {
+    background: var(--cream);
+    border-color: var(--rust);
+    color: var(--rust);
+  }
+
+  /* ─── PRODUCT GRID ─── */
+  .product-section { min-width: 0; }
+  .product-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .product-header-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--soil);
+  }
+  .product-header-count {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    font-weight: 400;
+  }
+
+  .sort-select {
+    border: 1.5px solid var(--border);
+    border-radius: 100px;
+    padding: 0.45rem 1rem;
+    font-size: 0.85rem;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-mid);
+    background: white;
+    cursor: pointer;
+    outline: none;
+  }
+  .sort-select:focus { border-color: var(--amber); }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.25rem;
+  }
+
+  /* ─── PRODUCT CARD ─── */
+  .product-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: var(--transition);
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+  }
+  .product-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(196,81,26,0.2);
+  }
+
+  .card-image-wrap {
+    position: relative;
+    aspect-ratio: 4/3;
+    background: linear-gradient(135deg, #f5ede0, #e8d5b8);
+    overflow: hidden;
+  }
+  .card-image-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .card-img-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+    background: linear-gradient(135deg, #f0e6d3, #ddc89e);
+  }
+
+  .card-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.25rem 0.6rem;
+    border-radius: 100px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .badge-promo { background: var(--rust); color: white; }
+  .badge-new { background: var(--sage); color: white; }
+  .badge-best { background: var(--gold); color: var(--soil); }
+
+  .card-fav {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+  }
+  .card-fav:hover { transform: scale(1.15); }
+
+  .card-body {
+    padding: 1rem 1rem 0.75rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-tag {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--sage);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.3rem;
+  }
+
+  .card-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--soil);
+    line-height: 1.3;
+    margin-bottom: 0.35rem;
+  }
+
+  .card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-bottom: 0.75rem;
+    margin-top: auto;
+  }
+  .card-meta-item {
+    font-size: 0.72rem;
+    color: var(--text-light);
+    background: var(--cream);
+    padding: 0.2rem 0.55rem;
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--border);
+    gap: 0.5rem;
+  }
+
+  .card-price {
+    display: flex;
+    flex-direction: column;
+  }
+  .card-price-main {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--rust);
+    line-height: 1;
+  }
+  .card-price-old {
+    font-size: 0.72rem;
+    color: var(--text-light);
+    text-decoration: line-through;
+  }
+
+  .card-add {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--rust), var(--amber));
+    color: white;
+    border: none;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    flex-shrink: 0;
+    box-shadow: 0 2px 10px rgba(196,81,26,0.3);
+  }
+  .card-add:hover { transform: scale(1.1) rotate(15deg); }
+
+  .card-stock {
+    font-size: 0.72rem;
+    color: var(--text-light);
+    padding: 0.2rem 0.5rem;
+    background: var(--cream);
+    border-radius: 100px;
+  }
+  .card-stock.low { color: var(--rust); background: rgba(196,81,26,0.08); }
+
+  /* ─── INFO PENJUALAN ─── */
+  .info-section {
+    background: linear-gradient(135deg, var(--bark), var(--mud));
+    color: var(--cream);
+    padding: 4rem 1.5rem;
+    margin-top: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .info-section::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: rgba(245,166,35,0.06);
+  }
+  .info-section::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(74,124,89,0.08);
+  }
+
+  .info-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+
+  .info-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .info-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.3rem, 3vw, 2rem);
+    color: var(--cream);
+    line-height: 1.15;
+  }
+  .info-title span { color: var(--gold); }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background: rgba(253,245,232,0.06);
+    border: 1px solid rgba(253,245,232,0.1);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+  }
+  .stat-card:hover { background: rgba(253,245,232,0.1); }
+  .stat-card-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  .stat-card-num {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.8rem;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .stat-card-label {
+    font-size: 0.8rem;
+    color: rgba(253,245,232,0.55);
+    margin-top: 0.3rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .stat-card-sub {
+    font-size: 0.82rem;
+    color: rgba(253,245,232,0.7);
+    margin-top: 0.5rem;
+  }
+
+  /* ─── CHART ─── */
+  .chart-table-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .chart-box, .table-box {
+    background: rgba(253,245,232,0.05);
+    border: 1px solid rgba(253,245,232,0.1);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+  }
+  .chart-box-title, .table-box-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: rgba(253,245,232,0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 1rem;
+  }
+
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 120px;
+  }
+  .bar-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+    justify-content: flex-end;
+  }
+  .bar {
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+    background: linear-gradient(to top, var(--rust), var(--gold));
+    opacity: 0.8;
+    min-height: 8px;
+    transition: var(--transition);
+  }
+  .bar:hover { opacity: 1; }
+  .bar-label { font-size: 0.65rem; color: rgba(253,245,232,0.45); text-align: center; }
+
+  .tx-table { width: 100%; border-collapse: collapse; }
+  .tx-table th {
+    font-size: 0.72rem;
+    color: rgba(253,245,232,0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.5rem 0;
+    text-align: left;
+    border-bottom: 1px solid rgba(253,245,232,0.08);
+  }
+  .tx-table td {
+    font-size: 0.82rem;
+    color: rgba(253,245,232,0.75);
+    padding: 0.6rem 0;
+    border-bottom: 1px solid rgba(253,245,232,0.05);
+  }
+  .tx-table td:last-child { color: var(--gold); font-weight: 600; text-align: right; }
+  .tx-status {
+    display: inline-flex;
+    padding: 0.15rem 0.5rem;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+  .tx-done { background: rgba(74,124,89,0.2); color: var(--green-light); }
+  .tx-pending { background: rgba(245,166,35,0.15); color: var(--gold); }
+
+  /* ─── CTA SECTION ─── */
+  .cta-section {
+    padding: 3rem 1.5rem;
+    background: var(--cream);
+    border-top: 1px solid var(--border);
+  }
+  .cta-inner {
+    max-width: 1440px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+  .cta-text h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: var(--soil);
+    margin-bottom: 0.4rem;
+  }
+  .cta-text p { color: var(--text-light); font-size: 0.9rem; }
+  .cta-buttons { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--soil);
+    color: rgba(253,245,232,0.6);
+    padding: 2rem 1.5rem;
+  }
+  .footer-inner {
+    max-width: 1440px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+  }
+  .footer-logo-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--rust), var(--amber));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+  .footer-logo-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--cream);
+  }
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    list-style: none;
+  }
+  .footer-links a {
+    color: rgba(253,245,232,0.5);
+    text-decoration: none;
+    font-size: 0.82rem;
+    transition: var(--transition);
+  }
+  .footer-links a:hover { color: var(--cream); }
+  .footer-copy { font-size: 0.78rem; }
+
+  /* ─── CART FLOAT ─── */
+  .cart-float {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 50;
+    background: linear-gradient(135deg, var(--rust), var(--amber));
+    color: white;
+    border: none;
+    border-radius: 100px;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 20px rgba(196,81,26,0.4);
+    transition: var(--transition);
+  }
+  .cart-float:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(196,81,26,0.5); }
+  .cart-badge {
+    background: white;
+    color: var(--rust);
+    border-radius: 100px;
+    padding: 0.1rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    min-width: 20px;
+    text-align: center;
+  }
+
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed;
+    top: 80px;
+    right: 1.5rem;
+    background: var(--soil);
+    color: var(--cream);
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 500;
+    z-index: 200;
+    transform: translateX(120%);
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: var(--shadow-lg);
+  }
+  .toast.show { transform: translateX(0); }
+
+  /* ─── RESPONSIVE ─── */
+
+  /* Tablet */
+  @media (max-width: 1024px) {
+    .main-layout {
+      grid-template-columns: 220px 1fr;
+      gap: 1.5rem;
+    }
+    .product-grid {
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+    .hero-stats { display: none; }
+    .chart-table-row { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 0 1rem; }
+    .nav-links, .nav-actions { display: none; }
+    .nav-hamburger { display: flex; }
+
+    .main-layout {
+      grid-template-columns: 1fr;
+      padding: 1rem;
+    }
+    .sidebar {
+      position: static;
+      display: none;
+    }
+    .sidebar.mobile-open { display: block; }
+
+    .hero-content {
+      grid-template-columns: 1fr;
+      padding: 3.5rem 1rem;
+    }
+
+    .product-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+
+    .info-section { padding: 2.5rem 1rem; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .chart-table-row { grid-template-columns: 1fr; }
+
+    .cta-inner { flex-direction: column; }
+    .cta-buttons { width: 100%; }
+    .cta-buttons .btn { flex: 1; justify-content: center; }
+
+    .footer-inner { flex-direction: column; text-align: center; }
+    .footer-links { justify-content: center; }
+
+    .info-header { flex-direction: column; align-items: flex-start; }
+  }
+
+  @media (max-width: 480px) {
+    .product-grid {
+      grid-template-columns: 1fr;
+    }
+    .hero-title { font-size: 1.75rem; }
+    .hero-actions { flex-direction: column; }
+    .hero-actions .btn { text-align: center; justify-content: center; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .hero-badge { animation: fadeUp 0.5s ease both; }
+  .hero-title { animation: fadeUp 0.6s 0.1s ease both; }
+  .hero-desc { animation: fadeUp 0.6s 0.2s ease both; }
+  .hero-actions { animation: fadeUp 0.6s 0.3s ease both; }
+
+  .product-card {
+    animation: fadeUp 0.5s ease both;
+  }
+  .product-card:nth-child(1) { animation-delay: 0.05s; }
+  .product-card:nth-child(2) { animation-delay: 0.1s; }
+  .product-card:nth-child(3) { animation-delay: 0.15s; }
+  .product-card:nth-child(4) { animation-delay: 0.2s; }
+  .product-card:nth-child(5) { animation-delay: 0.25s; }
+  .product-card:nth-child(6) { animation-delay: 0.3s; }
+
+  /* Mobile filter toggle */
+  .mobile-filter-btn {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 100px;
+    background: white;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-mid);
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .mobile-filter-btn:hover { border-color: var(--amber); color: var(--rust); }
+  @media (max-width: 768px) {
+    .mobile-filter-btn { display: inline-flex; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-icon">🐷</div>
+    <div class="nav-logo-text">
+      TriTernak
+      <span>Bibit Babi Unggul</span>
+    </div>
+  </a>
+
+  <ul class="nav-links">
+    <li><a href="#produk">Produk</a></li>
+    <li><a href="#info">Info Penjualan</a></li>
+    <li><a href="#cta">Pemesanan</a></li>
+    <li><a href="#footer">Kontak</a></li>
+  </ul>
+
+  <div class="nav-actions">
+    <button class="btn btn-ghost" onclick="showToast('Fitur segera hadir! 🛒')">🛒 Keranjang <span id="cart-count" style="background:var(--rust);color:white;border-radius:100px;padding:0.05rem 0.45rem;font-size:0.7rem;font-weight:700">0</span></button>
+    <button class="btn btn-primary" onclick="orderWA()">📱 Order WA</button>
+  </div>
+
+  <button class="nav-hamburger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#produk" onclick="toggleMenu()">🐷 Produk Bibit</a>
+  <a href="#info" onclick="toggleMenu()">📊 Info Penjualan</a>
+  <a href="#cta" onclick="toggleMenu()">📦 Pemesanan</a>
+  <a href="#footer" onclick="toggleMenu()">📞 Kontak</a>
+  <div class="mobile-menu-actions">
+    <button class="btn btn-wa" onclick="orderWA()">📱 Order via WhatsApp</button>
+    <button class="btn btn-pdf" onclick="downloadPDF()">📄 Transkrip PDF</button>
+  </div>
+</div>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div>
+      <div class="hero-badge">✨ Bibit Unggul Pilihan Peternak</div>
+      <h1 class="hero-title">
+        Sistem Informasi<br>
+        Penjualan <em>Bibit Ternak</em><br>
+        Babi Terpercaya
+      </h1>
+      <p class="hero-desc">
+        Temukan bibit babi berkualitas tinggi — Landrace, Yorkshire, Duroc, Berkshire, dan lebih. 
+        Harga transparan, stok real-time, pesan langsung via WhatsApp.
+      </p>
+      <div class="hero-actions">
+        <a href="#produk" class="btn btn-primary" style="font-size:1rem;padding:0.75rem 1.5rem">🐷 Lihat Katalog</a>
+        <a href="#info" class="btn" style="background:rgba(253,245,232,0.12);color:var(--cream);border:1.5px solid rgba(253,245,232,0.25);font-size:1rem;padding:0.75rem 1.5rem">📊 Info Penjualan</a>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-pill">
+        <div class="stat-pill-num">250+</div>
+        <div class="stat-pill-label">Stok Ekor</div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-pill-num">6</div>
+        <div class="stat-pill-label">Ras Bibit</div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-pill-num">98%</div>
+        <div class="stat-pill-label">Kepuasan</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SEARCH + CHIPS ── -->
+<div class="search-section" id="produk">
+  <div class="search-bar">
+    <span class="search-icon">🔍</span>
+    <input type="text" placeholder="Cari bibit babi (ras, bobot, harga...)" id="searchInput" oninput="filterProducts()">
+    <button class="btn btn-primary" style="padding:0.5rem 1.2rem;font-size:0.85rem" onclick="filterProducts()">Cari</button>
+  </div>
+  <div class="filter-chips" id="filterChips">
+    <button class="chip active" onclick="setChip(this,'semua')">🐷 Semua</button>
+    <button class="chip" onclick="setChip(this,'landrace')">🐗 Landrace</button>
+    <button class="chip" onclick="setChip(this,'yorkshire')">🐷 Yorkshire</button>
+    <button class="chip" onclick="setChip(this,'duroc')">🐽 Duroc</button>
+    <button class="chip" onclick="setChip(this,'berkshire')">🐖 Berkshire</button>
+    <button class="chip" onclick="setChip(this,'hampshire')">🐷 Hampshire</button>
+    <button class="chip promo-chip" onclick="setChip(this,'promo')">🔥 Promo</button>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<div class="main-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-title">Filter Produk</div>
+
+    <div class="sidebar-group">
+      <div class="sidebar-group-label">Kategori Ras</div>
+      <div class="sidebar-categories" id="sidebarCats">
+        <div class="sidebar-cat-item active" onclick="sidebarFilter(this,'semua')">
+          <span class="sidebar-cat-icon">🐷</span> Semua Bibit
+          <span class="sidebar-cat-count">12</span>
+        </div>
+        <div class="sidebar-cat-item" onclick="sidebarFilter(this,'landrace')">
+          <span class="sidebar-cat-icon">🐗</span> Landrace
+          <span class="sidebar-cat-count">3</span>
+        </div>
+        <div class="sidebar-cat-item" onclick="sidebarFilter(this,'yorkshire')">
+          <span class="sidebar-cat-icon">🐷</span> Yorkshire
+          <span class="sidebar-cat-count">2</span>
+        </div>
+        <div class="sidebar-cat-item" onclick="sidebarFilter(this,'duroc')">
+          <span class="sidebar-cat-icon">🐽</span> Duroc
+          <span class="sidebar-cat-count">2</span>
+        </div>
+        <div class="sidebar-cat-item" onclick="sidebarFilter(this,'berkshire')">
+          <span class="sidebar-cat-icon">🐖</span> Berkshire
+          <span class="sidebar-cat-count">2</span>
+        </div>
+        <div class="sidebar-cat-item" onclick="sidebarFilter(this,'hampshire')">
+          <span class="sidebar-cat-icon">🐷</span> Hampshire
+          <span class="sidebar-cat-count">2</span>
+        </div>
+        <div class="sidebar-cat-item" onclick="sidebarFilter(this,'promo')">
+          <span class="sidebar-cat-icon">🔥</span> Promo Aktif
+          <span class="sidebar-cat-count">4</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-group">
+      <div class="sidebar-group-label">Rentang Harga</div>
+      <div class="range-group">
+        <input type="range" min="500000" max="5000000" value="5000000" step="100000"
+          oninput="document.getElementById('priceVal').textContent='Rp '+parseInt(this.value).toLocaleString('id')">
+        <div class="range-labels">
+          <span>Rp 500rb</span>
+          <span id="priceVal">Rp 5.000.000</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-group">
+      <div class="sidebar-group-label">Bobot (kg)</div>
+      <div class="range-group">
+        <input type="range" min="5" max="60" value="60" step="1"
+          oninput="document.getElementById('bobot').textContent=this.value+'kg'">
+        <div class="range-labels">
+          <span>5 kg</span>
+          <span id="bobot">60 kg</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-group">
+      <div class="sidebar-group-label">Jenis Kelamin</div>
+      <div class="gender-toggle">
+        <button class="gender-btn active" onclick="genderFilter(this)">Semua</button>
+        <button class="gender-btn" onclick="genderFilter(this)">♂ Jantan</button>
+        <button class="gender-btn" onclick="genderFilter(this)">♀ Betina</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- PRODUCT SECTION -->
+  <section class="product-section">
+    <div class="product-header">
+      <div>
+        <h2 class="product-header-title">Daftar Bibit Ternak</h2>
+        <p class="product-header-count" id="productCount">Menampilkan 12 produk</p>
+      </div>
+      <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap">
+        <button class="mobile-filter-btn" onclick="toggleSidebar()">⚙️ Filter</button>
+        <select class="sort-select" onchange="sortProducts(this.value)">
+          <option value="default">Urutkan</option>
+          <option value="price-asc">Harga Termurah</option>
+          <option value="price-desc">Harga Termahal</option>
+          <option value="weight-asc">Bobot Ringan</option>
+          <option value="name">Nama A-Z</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="product-grid" id="productGrid">
+      <!-- generated by JS -->
+    </div>
+  </section>
+</div>
+
+<!-- ── SISTEM INFORMASI PENJUALAN ── -->
+<section class="info-section" id="info">
+  <div class="info-inner">
+    <div class="info-header">
+      <div>
+        <h2 class="info-title">Sistem Informasi<br><span>Penjualan Bibit Ternak</span></h2>
+        <p style="color:rgba(253,245,232,0.55);font-size:0.9rem;margin-top:0.4rem">Data real-time peternakan TriTernak</p>
+      </div>
+      <button class="btn" style="background:rgba(245,166,35,0.15);color:var(--gold);border:1px solid rgba(245,166,35,0.3)" onclick="showToast('Laporan berhasil diperbarui ✓')">
+        🔄 Perbarui Data
+      </button>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-card-icon">💰</span>
+        <div class="stat-card-num">Rp 48,5jt</div>
+        <div class="stat-card-label">Total Pendapatan</div>
+        <div class="stat-card-sub">↑ +12% dari bulan lalu</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card-icon">🐷</span>
+        <div class="stat-card-num">248</div>
+        <div class="stat-card-label">Stok Tersedia</div>
+        <div class="stat-card-sub">12 ekor terjual minggu ini</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card-icon">📦</span>
+        <div class="stat-card-num">37</div>
+        <div class="stat-card-label">Transaksi</div>
+        <div class="stat-card-sub">7 hari terakhir</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card-icon">⭐</span>
+        <div class="stat-card-num">4.9</div>
+        <div class="stat-card-label">Rating Kepuasan</div>
+        <div class="stat-card-sub">dari 120 ulasan pembeli</div>
+      </div>
+    </div>
+
+    <div class="chart-table-row">
+      <div class="chart-box">
+        <div class="chart-box-title">Penjualan 7 Hari Terakhir (ekor)</div>
+        <div class="bar-chart">
+          <div class="bar-wrap"><div class="bar" style="height:40%"></div><div class="bar-label">Sen</div></div>
+          <div class="bar-wrap"><div class="bar" style="height:65%"></div><div class="bar-label">Sel</div></div>
+          <div class="bar-wrap"><div class="bar" style="height:80%"></div><div class="bar-label">Rab</div></div>
+          <div class="bar-wrap"><div class="bar" style="height:55%"></div><div class="bar-label">Kam</div></div>
+          <div class="bar-wrap"><div class="bar" style="height:90%"></div><div class="bar-label">Jum</div></div>
+          <div class="bar-wrap"><div class="bar" style="height:70%"></div><div class="bar-label">Sab</div></div>
+          <div class="bar-wrap"><div class="bar" style="height:45%"></div><div class="bar-label">Min</div></div>
+        </div>
+      </div>
+      <div class="table-box">
+        <div class="table-box-title">Riwayat Transaksi Terbaru</div>
+        <table class="tx-table">
+          <thead>
+            <tr>
+              <th>Pembeli</th>
+              <th>Produk</th>
+              <th>Status</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Bpk Hendra</td>
+              <td>Landrace 20kg</td>
+              <td><span class="tx-status tx-done">Lunas</span></td>
+              <td>Rp 1.800.000</td>
+            </tr>
+            <tr>
+              <td>Ibu Sari</td>
+              <td>Yorkshire 25kg</td>
+              <td><span class="tx-status tx-done">Lunas</span></td>
+              <td>Rp 2.200.000</td>
+            </tr>
+            <tr>
+              <td>Bpk Tono</td>
+              <td>Duroc 30kg</td>
+              <td><span class="tx-status tx-pending">Proses</span></td>
+              <td>Rp 2.800.000</td>
+            </tr>
+            <tr>
+              <td>Ibu Dewi</td>
+              <td>Berkshire 18kg</td>
+              <td><span class="tx-status tx-done">Lunas</span></td>
+              <td>Rp 1.600.000</td>
+            </tr>
+            <tr>
+              <td>Bpk Agus</td>
+              <td>Hampshire 22kg</td>
+              <td><span class="tx-status tx-pending">Proses</span></td>
+              <td>Rp 1.950.000</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<section class="cta-section" id="cta">
+  <div class="cta-inner">
+    <div class="cta-text">
+      <h2>Siap Memesan Bibit?</h2>
+      <p>Pesan langsung via WhatsApp atau unduh transkrip harga lengkap dalam format PDF.</p>
+    </div>
+    <div class="cta-buttons">
+      <button class="btn btn-wa" style="padding:0.75rem 1.5rem;font-size:0.95rem" onclick="orderWA()">
+        📱 Order via WhatsApp
+      </button>
+      <button class="btn btn-pdf" style="padding:0.75rem 1.5rem;font-size:0.95rem" onclick="downloadPDF()">
+        📄 Unduh Transkrip Harga PDF
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer id="footer">
+  <div class="footer-inner">
+    <a href="#" class="footer-logo">
+      <div class="footer-logo-icon">🐷</div>
+      <div class="footer-logo-name">TriTernak</div>
+    </a>
+    <ul class="footer-links">
+      <li><a href="#">Tentang Kami</a></li>
+      <li><a href="#">Produk</a></li>
+      <li><a href="#">Syarat & Ketentuan</a></li>
+      <li><a href="#">Kebijakan Privasi</a></li>
+      <li><a href="#">Kontak</a></li>
+    </ul>
+    <p class="footer-copy">© 2025 TriTernak. Hak cipta dilindungi.</p>
+  </div>
+</footer>
+
+<!-- Cart Float -->
+<button class="cart-float" id="cartFloat" style="display:none" onclick="showToast('Keranjang dibuka 🛒')">
+  🛒 Keranjang <span class="cart-badge" id="cartBadge">0</span>
+</button>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA PRODUK ──
+const products = [
+  { id:1, ras:'landrace', name:'Landrace Jantan 20kg', weight:20, gender:'jantan', price:1800000, badge:'promo', oldPrice:2100000, stok:12, emoji:'🐗' },
+  { id:2, ras:'yorkshire', name:'Yorkshire Betina 25kg', weight:25, gender:'betina', price:2200000, badge:'best', stok:8, emoji:'🐷' },
+  { id:3, ras:'duroc', name:'Duroc Jantan 30kg', weight:30, gender:'jantan', price:2800000, badge:'new', stok:5, emoji:'🐽' },
+  { id:4, ras:'berkshire', name:'Berkshire Betina 18kg', weight:18, gender:'betina', price:1600000, badge:'promo', oldPrice:1900000, stok:14, emoji:'🐖' },
+  { id:5, ras:'hampshire', name:'Hampshire Jantan 22kg', weight:22, gender:'jantan', price:1950000, badge:'promo', oldPrice:2200000, stok:7, emoji:'🐷' },
+  { id:6, ras:'landrace', name:'Landrace Betina 28kg', weight:28, gender:'betina', price:2500000, badge:null, stok:10, emoji:'🐗' },
+  { id:7, ras:'yorkshire', name:'Yorkshire Jantan 35kg', weight:35, gender:'jantan', price:3200000, badge:'new', stok:4, emoji:'🐷' },
+  { id:8, ras:'duroc', name:'Duroc Betina 24kg', weight:24, gender:'betina', price:2350000, badge:null, stok:9, emoji:'🐽' },
+  { id:9, ras:'berkshire', name:'Berkshire Jantan 32kg', weight:32, gender:'jantan', price:2900000, badge:'best', stok:3, emoji:'🐖' },
+  { id:10, ras:'hampshire', name:'Hampshire Betina 20kg', weight:20, gender:'betina', price:1850000, badge:null, stok:11, emoji:'🐷' },
+  { id:11, ras:'landrace', name:'Landrace Jantan 15kg', weight:15, gender:'jantan', price:1400000, badge:'promo', oldPrice:1650000, stok:16, emoji:'🐗' },
+  { id:12, ras:'yorkshire', name:'Yorkshire Betina 40kg', weight:40, gender:'betina', price:3800000, badge:'best', stok:2, emoji:'🐷' },
+];
+
+let currentFilter = 'semua';
+let cartCount = 0;
+
+function formatRp(n) {
+  return 'Rp ' + n.toLocaleString('id');
+}
+
+function renderProducts(list) {
+  const grid = document.getElementById('productGrid');
+  document.getElementById('productCount').textContent = `Menampilkan ${list.length} produk`;
+
+  if (!list.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-light)"><div style="font-size:3rem;margin-bottom:1rem">🔍</div><p>Produk tidak ditemukan.</p></div>';
+    return;
+  }
+
+  grid.innerHTML = list.map((p, i) => `
+    <div class="product-card" style="animation-delay:${i*0.06}s">
+      <div class="card-image-wrap">
+        <div class="card-img-placeholder">${p.emoji}</div>
+        ${p.badge ? `<span class="card-badge badge-${p.badge}">${p.badge === 'promo' ? '🔥 PROMO' : p.badge === 'new' ? '✨ BARU' : '⭐ TERLARIS'}</span>` : ''}
+        <button class="card-fav" onclick="event.stopPropagation();this.textContent='❤️'" title="Favorit">🤍</button>
+      </div>
+      <div class="card-body">
+        <div class="card-tag">${p.ras.charAt(0).toUpperCase()+p.ras.slice(1)}</div>
+        <div class="card-name">${p.name}</div>
+        <div class="card-meta">
+          <span class="card-meta-item">⚖️ ${p.weight} kg</span>
+          <span class="card-meta-item">${p.gender === 'jantan' ? '♂' : '♀'} ${p.gender.charAt(0).toUpperCase()+p.gender.slice(1)}</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-price">
+          ${p.oldPrice ? `<div class="card-price-old">${formatRp(p.oldPrice)}</div>` : ''}
+          <div class="card-price-main">${formatRp(p.price)}</div>
+          <span class="card-stock ${p.stok <= 4 ? 'low' : ''}">
+            ${p.stok <= 4 ? '⚠️' : '✅'} Stok: ${p.stok} ekor
+          </span>
+        </div>
+        <button class="card-add" onclick="addToCart('${p.name}')" title="Tambah ke keranjang">+</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterProducts() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  let list = products;
+  if (currentFilter !== 'semua') {
+    if (currentFilter === 'promo') list = list.filter(p => p.badge === 'promo');
+    else list = list.filter(p => p.ras === currentFilter);
+  }
+  if (q) list = list.filter(p => p.name.toLowerCase().includes(q) || p.ras.toLowerCase().includes(q));
+  renderProducts(list);
+}
+
+function setChip(el, filter) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  currentFilter = filter;
+  // sync sidebar
+  document.querySelectorAll('#sidebarCats .sidebar-cat-item').forEach(c => {
+    c.classList.remove('active');
+    if (c.onclick.toString().includes(`'${filter}'`)) c.classList.add('active');
+  });
+  filterProducts();
+}
+
+function sidebarFilter(el, filter) {
+  document.querySelectorAll('#sidebarCats .sidebar-cat-item').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  currentFilter = filter;
+  document.querySelectorAll('.chip').forEach(c => {
+    c.classList.remove('active');
+    if (c.onclick.toString().includes(`'${filter}'`)) c.classList.add('active');
+  });
+  filterProducts();
+}
+
+function genderFilter(el) {
+  document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function sortProducts(val) {
+  let list = [...products];
+  if (currentFilter !== 'semua') {
+    if (currentFilter === 'promo') list = list.filter(p => p.badge === 'promo');
+    else list = list.filter(p => p.ras === currentFilter);
+  }
+  if (val === 'price-asc') list.sort((a,b) => a.price - b.price);
+  else if (val === 'price-desc') list.sort((a,b) => b.price - a.price);
+  else if (val === 'weight-asc') list.sort((a,b) => a.weight - b.weight);
+  else if (val === 'name') list.sort((a,b) => a.name.localeCompare(b.name));
+  renderProducts(list);
+}
+
+function addToCart(name) {
+  cartCount++;
+  document.getElementById('cart-count').textContent = cartCount;
+  document.getElementById('cartBadge').textContent = cartCount;
+  document.getElementById('cartFloat').style.display = 'flex';
+  showToast(`✅ ${name} ditambahkan ke keranjang`);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function toggleMenu() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('mobile-open');
+}
+
+function orderWA() {
+  const msg = encodeURIComponent('Halo TriTernak! Saya ingin memesan bibit babi. Mohon info ketersediaan dan harga terbaru. Terima kasih 🐷');
+  window.open('https://wa.me/6281234567890?text='+msg, '_blank');
+}
+
+function downloadPDF() {
+  showToast('📄 Mengunduh transkrip harga...');
+  setTimeout(() => showToast('✅ PDF berhasil diunduh!'), 1500);
+}
+
+// Init
+renderProducts(products);
+</script>
+</body>
+  </html>
